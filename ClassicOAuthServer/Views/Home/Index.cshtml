@@ -1,0 +1,63 @@
+﻿
+@{
+    ViewBag.Title = "Home";
+}
+
+<br />
+<div>
+    <a class="h3" href="/Account/Login?returnUrl=%2fHome">Login</a>
+</div>
+<br />
+<div class="h2">
+    OAuth
+</div>
+<br />
+<div>
+    <a class="h3" href="/OAuth/Authorize?response_type=token&client_id=some_client_id&redirect_uri=http%3A%2F%2Flocalhost%3A60350%2FHome%2FIndex">"Imlpicit Auth" or "one step" or "hash response")</a>
+</div>
+
+<br />
+<div>
+    <a class="h3" href="/OAuth/Authorize?response_type=code&client_id=some_client_id&redirect_uri=http%3A%2F%2Flocalhost%3A60350%2FHome%2FIndex">"Code Auth" or "two step" or "code response")</a>
+</div>
+<br />
+<hr />
+<div id="implicit-res" class="hidden">
+
+</div>
+
+<div id="code-res" class="hidden">
+    <pre>
+        <code>
+            var client = new HttpClient();
+
+            var formUrlEncodedContent = new FormUrlEncodedContent(new[]
+            {
+                new KeyValuePair&lt;string, string&gt;("grant_type", "authorization_code"),
+                new KeyValuePair&lt;string, string&gt;("client_id", "some_client_id"),
+                new KeyValuePair&lt;string, string&gt;("client_secret", "some_client_secret"),
+                new KeyValuePair&lt;string, string&gt;("redirect_uri", "http://localhost:60350/Home/Index"),
+                new KeyValuePair&lt;string, string&gt;("code", "<span id="code-string">16dddc27-e8b3-4dc2-b5df-ae5992b9639c</span>"),
+            });
+
+            var responseMessage = await client.PostAsync("http://localhost:60350/OAuth/Token", formUrlEncodedContent);
+
+            var jsonString = await responseMessage.Content.ReadAsStringAsync();
+        </code>
+    </pre>
+</div>
+
+<script>
+
+    if (window.location.hash && window.location.hash.indexOf("access_token") > -1) {
+        var el = document.getElementById("implicit-res");
+        
+        el.innerText = window.location.hash.split('&')[0].split('=')[1];
+        el.classList.remove("hidden");
+    } else if (window.location.href.indexOf("code") > -1) {
+        var el = document.getElementById("code-string");
+        el.innerText = window.location.href.split('=')[1];
+        document.getElementById("code-res").classList.remove("hidden");
+    }
+
+</script>
